@@ -56,7 +56,7 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], AppGateway.prototype, "server", void 0);
 exports.AppGateway = AppGateway = AppGateway_1 = __decorate([
-    (0, websockets_1.WebSocketGateway)(3006, { cors: true }),
+    (0, websockets_1.WebSocketGateway)({ cors: true }),
     __metadata("design:paramtypes", [jwt_1.JwtService])
 ], AppGateway);
 //# sourceMappingURL=app.gateway.js.map
