@@ -134,10 +134,10 @@ let CouponsService = class CouponsService {
     async checkValidCoupon(checkValidCouponDto, user, active = true) {
         const { code } = checkValidCouponDto;
         const codeCheck = await this.couponModel.findOne({ code: code });
-        if (codeCheck.quantity === 0) {
-            throw new common_1.BadRequestException(`Coupon có mã code ${code} hết hiệu lực`);
-        }
         if (codeCheck) {
+            if (codeCheck.quantity === 0) {
+                throw new common_1.BadRequestException(`Coupon có mã code ${code} hết hiệu lực`);
+            }
             codeCheck.quantity += active ? -1 : 1;
             await this.userService.checkIsActiveCode(user._id, codeCheck._id, active);
             await codeCheck.save();
