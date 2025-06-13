@@ -11,13 +11,14 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const vector_store_service_1 = require("./vector-store.service");
 const vector_store_schema_1 = require("./schemas/vector-store.schema");
+const document_schema_1 = require("./schemas/document.schema");
 let VectorStoreModule = class VectorStoreModule {
 };
 exports.VectorStoreModule = VectorStoreModule;
 exports.VectorStoreModule = VectorStoreModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: vector_store_schema_1.Vector.name, schema: vector_store_schema_1.VectorSchema }]),
+            mongoose_1.MongooseModule.forFeature([{ name: vector_store_schema_1.VectorDocument.name, schema: vector_store_schema_1.VectorSchema }, { name: document_schema_1.Document.name, schema: document_schema_1.DocumentSchema }]),
         ],
         providers: [vector_store_service_1.VectorStoreService],
         exports: [vector_store_service_1.VectorStoreService, mongoose_1.MongooseModule],

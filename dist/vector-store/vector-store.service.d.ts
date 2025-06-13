@@ -1,12 +1,24 @@
+import { Model } from 'mongoose';
+import { VectorDocument } from './schemas/vector-store.schema';
+import { Document } from './schemas/document.schema';
 export declare class VectorStoreService {
-    private client;
-    private dbName;
-    private collectionName;
+    private vectorModel;
+    private documentModel;
     private embeddings;
-    saveVector(text: string, source: string, vector: number[]): Promise<void>;
-    searchRelevantContent(query: string, topK?: number): Promise<{
-        score: number;
-        _id: import("bson").ObjectId;
+    constructor(vectorModel: Model<VectorDocument>, documentModel: Model<Document>);
+    processPDFAndStoreVector(buffer: any, filename: any, title: any): Promise<{
+        newDoc: import("mongoose").Document<unknown, {}, Document> & Document & Required<{
+            _id: unknown;
+        }> & {
+            __v?: number;
+        };
+    }>;
+    searchSimilarDocuments(query: string, topK?: number): Promise<{
+        content: string;
+        similarity: number;
+        metadata: {
+            filename: string;
+            title: string;
+        };
     }[]>;
-    clearAll(): Promise<void>;
 }

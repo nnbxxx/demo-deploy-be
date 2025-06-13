@@ -38,41 +38,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatAiController = void 0;
 const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs/promises"));
-const openai_1 = require("@langchain/openai");
 const vector_store_service_1 = require("../vector-store/vector-store.service");
 const interactive_agent_service_1 = require("./ultils/interactive-agent.service");
 const customize_1 = require("../decorator/customize");
-const chat_ai_service_1 = require("./chat-ai.service");
 const swagger_1 = require("@nestjs/swagger");
 let ChatAiController = class ChatAiController {
-    constructor(vectorStoreService, chatAiService, interactiveAgentService) {
+    constructor(vectorStoreService, interactiveAgentService) {
         this.vectorStoreService = vectorStoreService;
-        this.chatAiService = chatAiService;
         this.interactiveAgentService = interactiveAgentService;
         this.uploadDir = path.join(__dirname, '..', '..', 'uploads');
-        this.embeddings = new openai_1.OpenAIEmbeddings({
-            openAIApiKey: process.env.OPENAI_API_KEY,
-        });
         fs.mkdir(this.uploadDir, { recursive: true }).catch(console.error);
-    }
-    async askTheAgent(question) {
-        if (question?.trim() === '') {
-            throw new common_1.BadRequestException('Query parameter "question" cannot be empty.');
-        }
-        try {
-            const answer = await this.chatAiService.ask(question);
-            return {
-                question: question,
-                answer: answer,
-                timestamp: new Date().toISOString(),
-            };
-        }
-        catch (error) {
-            console.error('Error interacting with AI Agent:', error);
-            throw new common_1.InternalServerErrorException(`Sorry, an error occurred while processing your request. Please try again later.`);
-        }
     }
     async interactWithAgent(question) {
         if (!question?.trim()) {
@@ -86,21 +64,30 @@ let ChatAiController = class ChatAiController {
             throw new common_1.InternalServerErrorException(`Lỗi xử lý yêu cầu: ${error.message}`);
         }
     }
+    async uploadDocument(file, title) {
+        if (!file) {
+            throw new common_1.BadRequestException('No file uploaded');
+        }
+        if (!title) {
+            throw new common_1.BadRequestException('Title is required');
+        }
+        try {
+            const metadata = await this.vectorStoreService.processPDFAndStoreVector(file.buffer, file.originalname, title);
+            return {
+                message: 'PDF uploaded and vector stored successfully',
+                metadata,
+            };
+        }
+        catch (err) {
+            console.error('Upload failed:', err);
+            throw new common_1.InternalServerErrorException('Upload failed: ' + err.message);
+        }
+    }
+    async searchDocuments(query) {
+        return this.vectorStoreService.searchSimilarDocuments(query);
+    }
 };
 exports.ChatAiController = ChatAiController;
-__decorate([
-    (0, customize_1.Public)(),
-    (0, common_1.Get)('ask'),
-    (0, swagger_1.ApiOperation)({ summary: 'Gửi câu hỏi tới Chat AI và nhận câu trả lời' }),
-    (0, swagger_1.ApiQuery)({ name: 'question', required: true, description: 'Câu hỏi' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Câu trả lời từ Chat AI' }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Query parameter không hợp lệ' }),
-    openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Query)('question')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], ChatAiController.prototype, "askTheAgent", null);
 __decorate([
     (0, customize_1.Public)(),
     (0, common_1.Get)('interact'),
@@ -114,11 +101,49 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ChatAiController.prototype, "interactWithAgent", null);
+__decorate([
+    (0, customize_1.Public)(),
+    (0, common_1.Post)('documents'),
+    (0, swagger_1.ApiOperation)({ summary: 'Upload file PDF và lưu vector' }),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                },
+                title: {
+                    type: 'string',
+                },
+            },
+            required: ['file', 'title'],
+        },
+    }),
+    openapi.ApiResponse({ status: 201 }),
+    __param(0, (0, common_1.UploadedFile)()),
+    __param(1, (0, common_1.Body)('title')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], ChatAiController.prototype, "uploadDocument", null);
+__decorate([
+    (0, customize_1.Public)(),
+    (0, common_1.Get)('search'),
+    (0, swagger_1.ApiOperation)({ summary: 'Tìm kiếm tài liệu gần giống với câu truy vấn' }),
+    (0, swagger_1.ApiQuery)({ name: 'query', type: String }),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Query)('query')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ChatAiController.prototype, "searchDocuments", null);
 exports.ChatAiController = ChatAiController = __decorate([
     (0, swagger_1.ApiTags)('chat-ai'),
     (0, common_1.Controller)('chat-ai'),
     __metadata("design:paramtypes", [vector_store_service_1.VectorStoreService,
-        chat_ai_service_1.ChatAiService,
         interactive_agent_service_1.InteractiveAgentService])
 ], ChatAiController);
 //# sourceMappingURL=chat-ai.controller.js.map

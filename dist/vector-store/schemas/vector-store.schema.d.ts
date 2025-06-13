@@ -1,16 +1,18 @@
-import { Document } from 'mongoose';
-export type VectorDocument = Vector & Document;
-export declare class Vector {
-    text: string;
-    source: string;
+import { Document as MongooseDocument } from 'mongoose';
+export declare class VectorDocument extends MongooseDocument {
+    content: string;
     embedding: number[];
+    metadata: {
+        filename: string;
+        title: string;
+    };
 }
-export declare const VectorSchema: import("mongoose").Schema<Vector, import("mongoose").Model<Vector, any, any, any, Document<unknown, any, Vector> & Vector & {
-    _id: import("mongoose").Types.ObjectId;
-} & {
+export declare const VectorSchema: import("mongoose").Schema<VectorDocument, import("mongoose").Model<VectorDocument, any, any, any, MongooseDocument<unknown, any, VectorDocument> & VectorDocument & Required<{
+    _id: unknown;
+}> & {
     __v?: number;
-}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Vector, Document<unknown, {}, import("mongoose").FlatRecord<Vector>> & import("mongoose").FlatRecord<Vector> & {
-    _id: import("mongoose").Types.ObjectId;
-} & {
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VectorDocument, MongooseDocument<unknown, {}, import("mongoose").FlatRecord<VectorDocument>> & import("mongoose").FlatRecord<VectorDocument> & Required<{
+    _id: unknown;
+}> & {
     __v?: number;
 }>;

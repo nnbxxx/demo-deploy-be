@@ -9,32 +9,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VectorSchema = exports.VectorDocument = void 0;
+exports.ChatbotMemorySchema = exports.ChatbotMemory = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
-const mongoose_2 = require("mongoose");
-let VectorDocument = class VectorDocument extends mongoose_2.Document {
+let ChatbotMemory = class ChatbotMemory {
 };
-exports.VectorDocument = VectorDocument;
+exports.ChatbotMemory = ChatbotMemory;
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, index: true }),
+    __metadata("design:type", String)
+], ChatbotMemory.prototype, "userId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, index: true }),
+    __metadata("design:type", String)
+], ChatbotMemory.prototype, "conversationId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
-], VectorDocument.prototype, "content", void 0);
+], ChatbotMemory.prototype, "content", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [Number], required: true }),
+    (0, mongoose_1.Prop)({ type: [Number] }),
     __metadata("design:type", Array)
-], VectorDocument.prototype, "embedding", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({
-        type: {
-            filename: String,
-            title: String,
-        },
-        required: true,
-    }),
-    __metadata("design:type", Object)
-], VectorDocument.prototype, "metadata", void 0);
-exports.VectorDocument = VectorDocument = __decorate([
+], ChatbotMemory.prototype, "embedding", void 0);
+exports.ChatbotMemory = ChatbotMemory = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
-], VectorDocument);
-exports.VectorSchema = mongoose_1.SchemaFactory.createForClass(VectorDocument);
-//# sourceMappingURL=vector-store.schema.js.map
+], ChatbotMemory);
+exports.ChatbotMemorySchema = mongoose_1.SchemaFactory.createForClass(ChatbotMemory);
+//# sourceMappingURL=chatbot-memory.schema.js.map

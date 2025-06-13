@@ -9,35 +9,33 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetTimeTool = void 0;
+exports.ResetConversationTool = void 0;
 const common_1 = require("@nestjs/common");
-const tools_1 = require("@langchain/core/tools");
+const tools_1 = require("langchain/tools");
 const zod_1 = require("zod");
-let GetTimeTool = class GetTimeTool extends tools_1.DynamicStructuredTool {
+let ResetConversationTool = class ResetConversationTool extends tools_1.DynamicStructuredTool {
+    setMemory(memory) {
+        this.memory = memory;
+    }
     constructor() {
         super({
-            name: 'get_current_time',
-            description: 'Rất hữu ích khi bạn cần biết thời gian hiện tại. Chỉ dùng khi người dùng hỏi cụ thể về "mấy giờ rồi", "giờ hiện tại", "thời gian bây giờ".',
+            name: 'reset_conversation',
+            description: 'Reset lại cuộc hội thoại ngay lập tức mà không cần xác nhận.',
             schema: zod_1.z.object({}),
             func: async () => {
-                try {
-                    const now = new Date();
-                    return `Bây giờ là ${now.toLocaleTimeString('vi-VN', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                    })}`;
-                }
-                catch (error) {
-                    return 'Xin lỗi, tôi không thể lấy được thời gian hiện tại.';
-                }
+                if (!this.memory)
+                    return 'Không thể reset: memory chưa được khởi tạo.';
+                await this.memory.clear();
+                return 'Đã reset lại cuộc hội thoại. Bạn có thể bắt đầu cuộc trò chuyện mới.';
             },
         });
+        this.name = 'reset_conversation';
+        this.description = 'Xóa toàn bộ lịch sử cuộc hội thoại.';
     }
 };
-exports.GetTimeTool = GetTimeTool;
-exports.GetTimeTool = GetTimeTool = __decorate([
+exports.ResetConversationTool = ResetConversationTool;
+exports.ResetConversationTool = ResetConversationTool = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [])
-], GetTimeTool);
-//# sourceMappingURL=get-time.tool.js.map
+], ResetConversationTool);
+//# sourceMappingURL=reset-conversation.tool%20.js.map
