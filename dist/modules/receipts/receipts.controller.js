@@ -76,11 +76,11 @@ let ReceiptsController = class ReceiptsController {
     async callbackVNPay(query, res) {
         const result = this.receiptsService.validatePaymentCallback(query);
         if (!result.isSuccess) {
-            const failUrl = `https://sac-client-v6.vercel.app/dashboard/my-orders`;
+            const failUrl = `https://sac-client-v7.vercel.app/dashboard/my-orders`;
             return res.redirect(failUrl);
         }
         await this.receiptsService.confirmPaid(result.vnp_TxnRef);
-        const succeedUrl = `https://sac-client-v6.vercel.app/dashboard/my-orders`;
+        const succeedUrl = `https://sac-client-v7.vercel.app/dashboard/my-orders`;
         return res.redirect(succeedUrl);
     }
 };
